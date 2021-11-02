@@ -6,7 +6,8 @@ networks:
 services:
   nginx:
     image: nginx:stable-alpine
-    container_name: nginx-amirghotb
+    container_name: nginx-console-raspina
+    restart: always
     ports:
       - '8000:80'
     volumes:
@@ -19,11 +20,13 @@ services:
       - backend
   db:
     image: mysql:8.0.26
-    container_name: db
-    restart: unless-stopped
+    container_name: db-console-raspina
+    restart: always
     tty: true
     ports:
       - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
     environment:
       MYSQL_DATABASE: laravel
       MYSQL_ROOT_PASSWORD: raspina
@@ -35,7 +38,8 @@ services:
     build:
       context: .
       dockerfile: dockerFile
-    container_name: php-amirghotb
+    container_name: php-console-raspina
+    restart: always
     volumes:
       - ./src:/var/www/html
     ports:
@@ -44,7 +48,8 @@ services:
       - backend
   composer:
     image: composer:latest
-    container_name: composer-amirghotb
+    container_name: composer-console-raspina
+    restart: always
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
@@ -54,7 +59,8 @@ services:
       - backend
   npm:
     image: node:latest
-    container_name: npm-amirghotb
+    restart: always
+    container_name: npm-console-raspina
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
@@ -63,7 +69,8 @@ services:
     build:
       context: .
       dockerfile: dockerFile
-    container_name: artisan-amirghotb
+    container_name: artisan-console-raspina
+    restart: always
     volumes:
       - ./src:/var/www/html
     depends_on:
@@ -72,3 +79,5 @@ services:
     entrypoint: [ 'php','/var/www/html/artisan' ]
     networks:
       - backend
+volumes:
+  db_data: {}
